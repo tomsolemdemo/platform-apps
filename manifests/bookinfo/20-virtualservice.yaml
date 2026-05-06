@@ -1,0 +1,69 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: virtualservice-bookinfo
+  namespace: bookinfo
+spec:
+  hosts:
+  - "demo.tomsolem.no"
+  gateways:
+  - default/default-gateway-ingress
+  http:
+  # /bookinfo/static/<x> -> /static/<x>
+  - match:
+    - uri:
+        prefix: /bookinfo/static/
+    rewrite:
+      uri: /static/
+    route:
+    - destination:
+        host: productpage.bookinfo.svc.cluster.local
+        port:
+          number: 9080
+  # /bookinfo/api/<x> -> /api/<x>
+  - match:
+    - uri:
+        prefix: /bookinfo/api/
+    rewrite:
+      uri: /api/
+    route:
+    - destination:
+        host: productpage.bookinfo.svc.cluster.local
+        port:
+          number: 9080
+  # /bookinfo/login, /bookinfo/logout -> /login, /logout
+  - match:
+    - uri:
+        exact: /bookinfo/login
+    rewrite:
+      uri: /login
+    route:
+    - destination:
+        host: productpage.bookinfo.svc.cluster.local
+        port:
+          number: 9080
+  - match:
+    - uri:
+        exact: /bookinfo/logout
+    rewrite:
+      uri: /logout
+    route:
+    - destination:
+        host: productpage.bookinfo.svc.cluster.local
+        port:
+          number: 9080
+  # /bookinfo, /bookinfo/, /bookinfo/productpage -> /productpage
+  - match:
+    - uri:
+        exact: /bookinfo
+    - uri:
+        exact: /bookinfo/
+    - uri:
+        prefix: /bookinfo/productpage
+    rewrite:
+      uri: /productpage
+    route:
+    - destination:
+        host: productpage.bookinfo.svc.cluster.local
+        port:
+          number: 9080
